@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Maison Élara</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-body">
+
+<!-- ── Login Screen ──────────────────────────────────────────────────────────── -->
+<div id="loginScreen" class="admin-login">
+  <div class="login-card">
+    <div class="login-logo">Maison <span>Élara</span></div>
+    <p class="login-sub">Admin Dashboard</p>
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" placeholder="admin" required>
+      </div>
+      <div class="form-group">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" required>
+      </div>
+      <div id="loginError" style="display:none;color:#842029;font-size:0.85rem;margin-bottom:1rem;padding:0.75rem;background:#F8D7DA;border-radius:2px;">
+        Invalid credentials. Please try again.
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+        Sign In
+      </button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;font-size:0.8rem;color:var(--grey)">
+      Default: admin / maison2026
+    </p>
+  </div>
+</div>
+
+<!-- ── Admin Layout ───────────────────────────────────────────────────────────── -->
+<div id="adminLayout" class="admin-layout" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">
+      Maison <span>Élara</span>
+      <small>Admin Panel</small>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="active" data-section="dashboard"><span>📊</span> Dashboard</a>
+      <a href="#" data-section="menu"><span>🍽️</span> Menu Items</a>
+      <a href="#" data-section="orders"><span>📋</span> Orders</a>
+      <a href="#" data-section="reservations"><span>📅</span> Reservations</a>
+      <a href="#" data-section="reviews"><span>⭐</span> Reviews</a>
+      <a href="/" style="margin-top:auto;border-top:1px solid rgba(201,169,110,0.2);padding-top:1rem"><span>🌐</span> View Website</a>
+    </nav>
+    <div class="sidebar-logout">
+      <button id="logoutBtn">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+
+    <!-- Dashboard -->
+    <div id="section-dashboard" class="admin-section active">
+      <div class="admin-topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p id="dashDate"></p>
+        </div>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Total Orders</div></div>
+        <div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Total Revenue</div></div>
+        <div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Reservations Today</div></div>
+        <div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Pending Orders</div></div>
+        <div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Menu Items</div></div>
+        <div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Total Reviews</div></div>
+      </div>
+      <div class="admin-card" style="margin-top:2rem">
+        <div class="admin-card-header"><h3>Recent Orders</h3></div>
+        <div style="overflow-x:auto"><table id="dashOrdersTable">
+          <thead><tr><th>ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Menu Management -->
+    <div id="section-menu" class="admin-section">
+      <div class="admin-topbar">
+        <div><h1>Menu Items</h1><p>Manage your restaurant's menu</p></div>
+        <button class="btn btn-primary" id="toggleAddItem">+ Add Item</button>
+      </div>
+      <div class="admin-card">
+        <div class="add-item-form" id="addItemForm">
+          <h4 style="margin-bottom:1.25rem;font-size:1.1rem;color:var(--burgundy-deep)">
+            <span id="formTitle">Add New Item</span>
+          </h4>
+          <form id="menuItemForm" novalidate>
+            <input type="hidden" id="editItemId">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="itemName">Item Name *</label>
+                <input type="text" id="itemName" placeholder="e.g. Truffle Risotto" required>
+              </div>
+              <div class="form-group">
+                <label for="itemCategory">Category *</label>
+                <select id="itemCategory" required>
+                  <option value="">Select category</option>
+                  <option>Breakfast</option><option>Lunch</option>
+                  <option>Dinner</option><option>Drinks</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="itemPrice">Price (€) *</label>
+                <input type="number" id="itemPrice" step="0.01" min="0" placeholder="0.00" required>
+              </div>
+              <div class="form-group">
+                <label for="itemImage">Image URL</label>
+                <input type="url" id="itemImage" placeholder="https://...">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="itemDesc">Description *</label>
+              <textarea id="itemDesc" placeholder="Describe the dish..." required></textarea>
+            </div>
+            <div style="display:flex;gap:1rem">
+              <button type="submit" class="btn btn-primary" id="saveItemBtn">Save Item</button>
+              <button type="button" class="btn btn-outline" id="cancelItemBtn">Cancel</button>
+            </div>
+          </form>
+        </div>
+        <div style="overflow-x:auto"><table id="menuTable">
+          <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+          <tbody><tr><td colspan="4" style="text-align:center;color:var(--grey)">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div id="section-orders" class="admin-section">
+      <div class="admin-topbar"><div><h1>Orders</h1><p>Track and manage customer orders</p></div></div>
+      <div class="admin-card">
+        <div style="overflow-x:auto"><table id="ordersTable">
+          <thead><tr><th>ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="7" style="text-align:center;color:var(--grey)">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Reservations -->
+    <div id="section-reservations" class="admin-section">
+      <div class="admin-topbar"><div><h1>Reservations</h1><p>Manage table bookings</p></div></div>
+      <div class="admin-card">
+        <div style="overflow-x:auto"><table id="reservationsTable">
+          <thead><tr><th>Name</th><th>Date</th><th>Time</th><th>Guests</th><th>Notes</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="7" style="text-align:center;color:var(--grey)">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Reviews -->
+    <div id="section-reviews" class="admin-section">
+      <div class="admin-topbar"><div><h1>Reviews</h1><p>Customer feedback and ratings</p></div></div>
+      <div class="admin-card">
+        <div style="overflow-x:auto"><table id="reviewsTable">
+          <thead><tr><th>Name</th><th>Rating</th><th>Comment</th><th>Date</th></tr></thead>
+          <tbody><tr><td colspan="4" style="text-align:center;color:var(--grey)">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

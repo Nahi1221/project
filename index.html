@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maison Élara — Fine Dining</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────────────────────────── -->
+<nav id="navbar">
+  <div class="container nav-inner">
+    <a href="#hero" class="nav-logo">Maison <span>Élara</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#reservation">Reserve</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li>
+        <a href="#" class="nav-cart" id="cartToggle">
+          🛒 Cart
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+      </li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── Hero Section ─────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span>Est. 2018 · Amsterdam</span>
+      </div>
+      <h1 class="hero-title">
+        Where Every Meal
+        <em>Becomes a Memory</em>
+      </h1>
+      <p class="hero-subtitle">
+        An intimate sanctuary of refined gastronomy, where classical technique meets seasonal imagination.
+      </p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn btn-primary">Explore the Menu</a>
+        <a href="#reservation" class="btn btn-outline" style="color:white;border-color:rgba(255,255,255,0.5)">Reserve a Table</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ── About Strip ──────────────────────────────────────────────────────────── -->
+<section id="about-strip">
+  <div class="container">
+    <div class="strip-grid">
+      <div class="strip-item">
+        <div class="strip-num">8+</div>
+        <div class="strip-label">Years of Excellence</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-num">24</div>
+        <div class="strip-label">Signature Dishes</div>
+      </div>
+      <div class="strip-item">
+        <div class="strip-num">★ 4.9</div>
+        <div class="strip-label">Guest Rating</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Menu Section ─────────────────────────────────────────────────────────── -->
+<section id="menu">
+  <div class="container">
+    <div class="menu-header fade-in">
+      <p class="section-tag">Curated Selection</p>
+      <h2 class="section-title">Our Menu</h2>
+      <div class="divider"></div>
+      <p style="color:var(--grey);font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;max-width:480px;margin:0 auto;">
+        Crafted with seasonal produce and meticulous care, each dish tells a story.
+      </p>
+    </div>
+
+    <div class="category-tabs" id="categoryTabs">
+      <button class="tab-btn active" data-cat="all">All</button>
+      <button class="tab-btn" data-cat="Breakfast">Breakfast</button>
+      <button class="tab-btn" data-cat="Lunch">Lunch</button>
+      <button class="tab-btn" data-cat="Dinner">Dinner</button>
+      <button class="tab-btn" data-cat="Drinks">Drinks</button>
+    </div>
+
+    <div class="menu-grid" id="menuGrid">
+      <div class="loading">Loading menu</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Reservation Section ──────────────────────────────────────────────────── -->
+<section id="reservation">
+  <div class="container">
+    <div class="reservation-grid">
+      <div class="reservation-info fade-in">
+        <p class="section-tag">Your Table Awaits</p>
+        <h2 class="section-title" style="color:white">Reserve a Table</h2>
+        <div class="divider"></div>
+        <p>
+          Whether it's an intimate dinner for two or a celebratory gathering, we'll ensure every detail is perfect.
+        </p>
+        <div class="res-details">
+          <div class="res-detail">
+            <span>🕐</span>
+            <span>Mon–Thu: 11:00 – 22:00</span>
+          </div>
+          <div class="res-detail">
+            <span>🕐</span>
+            <span>Fri–Sat: 11:00 – 23:00</span>
+          </div>
+          <div class="res-detail">
+            <span>🕐</span>
+            <span>Sunday: 12:00 – 21:00</span>
+          </div>
+          <div class="res-detail">
+            <span>📞</span>
+            <span>+31 20 123 4567</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="reservation-form fade-in">
+        <form id="reservationForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="resName">Full Name</label>
+              <input type="text" id="resName" name="name" placeholder="Your name" required>
+            </div>
+            <div class="form-group">
+              <label for="resPhone">Phone</label>
+              <input type="tel" id="resPhone" name="phone" placeholder="+31 6 ...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="resEmail">Email Address</label>
+            <input type="email" id="resEmail" name="email" placeholder="your@email.com" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="resDate">Date</label>
+              <input type="date" id="resDate" name="date" required>
+            </div>
+            <div class="form-group">
+              <label for="resTime">Time</label>
+              <select id="resTime" name="time" required>
+                <option value="">Select time</option>
+                <option>11:00</option><option>11:30</option>
+                <option>12:00</option><option>12:30</option>
+                <option>13:00</option><option>13:30</option>
+                <option>14:00</option><option>17:00</option>
+                <option>17:30</option><option>18:00</option>
+                <option>18:30</option><option>19:00</option>
+                <option>19:30</option><option>20:00</option>
+                <option>20:30</option><option>21:00</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="resGuests">Number of Guests</label>
+            <select id="resGuests" name="guests" required>
+              <option value="">Select guests</option>
+              <option>1</option><option>2</option><option>3</option>
+              <option>4</option><option>5</option><option>6</option>
+              <option>7</option><option>8+</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="resNotes">Special Requests</label>
+            <textarea id="resNotes" name="notes" placeholder="Dietary requirements, celebrations, seating preferences..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center">
+            Confirm Reservation
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Reviews Section ──────────────────────────────────────────────────────── -->
+<section id="reviews">
+  <div class="container">
+    <div class="reviews-header fade-in">
+      <p class="section-tag">Guest Experiences</p>
+      <h2 class="section-title">What Our Guests Say</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="reviews-grid" id="reviewsGrid">
+      <div class="loading">Loading reviews</div>
+    </div>
+
+    <div class="add-review fade-in">
+      <h4>Share Your Experience</h4>
+      <form id="reviewForm" novalidate>
+        <div class="form-group">
+          <label for="reviewName">Your Name</label>
+          <input type="text" id="reviewName" name="name" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="star-rating">
+            <input type="radio" name="rating" id="s5" value="5"><label for="s5">★</label>
+            <input type="radio" name="rating" id="s4" value="4"><label for="s4">★</label>
+            <input type="radio" name="rating" id="s3" value="3"><label for="s3">★</label>
+            <input type="radio" name="rating" id="s2" value="2"><label for="s2">★</label>
+            <input type="radio" name="rating" id="s1" value="1"><label for="s1">★</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reviewComment">Your Review</label>
+          <textarea id="reviewComment" name="comment" placeholder="Tell us about your experience..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Review</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── Contact Section ──────────────────────────────────────────────────────── -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="fade-in">
+        <p class="section-tag">Get in Touch</p>
+        <h2 class="section-title">Find Us</h2>
+        <div class="divider"></div>
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="icon">📍</div>
+            <div class="contact-item-text">
+              <strong>Address</strong>
+              <span>Herengracht 412, 1017 BZ Amsterdam</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📞</div>
+            <div class="contact-item-text">
+              <strong>Phone</strong>
+              <span>+31 20 123 4567</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">✉️</div>
+            <div class="contact-item-text">
+              <strong>Email</strong>
+              <span>hello@maisonelara.com</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">🌐</div>
+            <div class="contact-item-text">
+              <strong>Social</strong>
+              <span>@maisonelara</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-in" style="background:var(--white);border-radius:2px;overflow:hidden;box-shadow:var(--shadow);height:360px;display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;color:var(--grey);padding:2rem;">
+          <div style="font-size:3rem;margin-bottom:1rem;">🗺️</div>
+          <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;">Herengracht 412<br>Amsterdam, Netherlands</p>
+          <p style="margin-top:0.5rem;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;">Near Koningsplein</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────────────────── -->
+<footer>
+  <p>© 2026 <strong>Maison Élara</strong> · Herengracht 412, Amsterdam · Crafted with passion</p>
+</footer>
+
+<!-- ── Cart Sidebar ─────────────────────────────────────────────────────────── -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3>Your Order</h3>
+    <button class="cart-close" id="cartClose">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Your cart is empty</div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-subtotal">
+      <span>Total</span>
+      <span class="total-price" id="cartTotal">€0.00</span>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" id="checkoutBtn">
+      Proceed to Checkout
+    </button>
+  </div>
+</aside>
+
+<!-- ── Checkout Modal ────────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Complete Your Order</h3>
+      <button class="modal-close" id="checkoutClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="orderSummary" style="margin-bottom:1.5rem;padding:1rem;background:var(--cream);border-radius:2px;"></div>
+      <form id="checkoutForm" novalidate>
+        <div class="form-group">
+          <label for="custName">Full Name</label>
+          <input type="text" id="custName" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label for="custEmail">Email Address</label>
+          <input type="email" id="custEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="custNotes">Special Requests</label>
+          <textarea id="custNotes" placeholder="Allergies, dietary notes..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+          Place Order
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast Container ───────────────────────────────────────────────────────── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
