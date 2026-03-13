@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="admin-body">
-
+ 
 <!-- ── Login Screen ──────────────────────────────────────────────────────────── -->
 <div id="loginScreen" class="admin-login">
   <div class="login-card">
@@ -32,12 +32,46 @@
     <p style="text-align:center;margin-top:1.5rem;font-size:0.8rem;color:var(--grey)">
       Default: admin / maison2026
     </p>
+    <p style="text-align:center;margin-top:0.75rem">
+      <a href="#" id="forgotPasswordLink" style="font-size:0.8rem;color:var(--burgundy)">Forgot password?</a>
+    </p>
   </div>
 </div>
-
+ 
+<!-- Forgot Password Modal -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Reset Password</h3>
+      <button class="modal-close" id="forgotClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--grey);margin-bottom:1.5rem">
+        Enter your recovery key and a new password to regain access.
+      </p>
+      <form id="recoverForm" novalidate>
+        <div class="form-group">
+          <label for="recoveryKey">Recovery Key</label>
+          <input type="text" id="recoveryKey" placeholder="ELARA-RECOVERY-2026" required>
+        </div>
+        <div class="form-group">
+          <label for="recoverNewPass">New Password</label>
+          <input type="password" id="recoverNewPass" placeholder="Min. 6 characters" required>
+        </div>
+        <div class="form-group">
+          <label for="recoverConfirmPass">Confirm New Password</label>
+          <input type="password" id="recoverConfirmPass" placeholder="Repeat new password" required>
+        </div>
+        <div id="recoverError" style="display:none;color:#842029;font-size:0.85rem;margin-bottom:1rem;padding:0.75rem;background:#F8D7DA;border-radius:2px;"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Reset Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+ 
 <!-- ── Admin Layout ───────────────────────────────────────────────────────────── -->
 <div id="adminLayout" class="admin-layout" style="display:none">
-
+ 
   <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div class="sidebar-logo">
@@ -50,16 +84,18 @@
       <a href="#" data-section="orders"><span>📋</span> Orders</a>
       <a href="#" data-section="reservations"><span>📅</span> Reservations</a>
       <a href="#" data-section="reviews"><span>⭐</span> Reviews</a>
+      <a href="#" data-section="settings"><span>⚙️</span> Settings</a>
+      <a href="#" data-section="password"><span>🔑</span> Change Password</a>
       <a href="/" style="margin-top:auto;border-top:1px solid rgba(201,169,110,0.2);padding-top:1rem"><span>🌐</span> View Website</a>
     </nav>
     <div class="sidebar-logout">
       <button id="logoutBtn">Sign Out</button>
     </div>
   </aside>
-
+ 
   <!-- Main Content -->
   <main class="admin-main">
-
+ 
     <!-- Dashboard -->
     <div id="section-dashboard" class="admin-section active">
       <div class="admin-topbar">
@@ -84,7 +120,7 @@
         </table></div>
       </div>
     </div>
-
+ 
     <!-- Menu Management -->
     <div id="section-menu" class="admin-section">
       <div class="admin-topbar">
@@ -138,7 +174,7 @@
         </table></div>
       </div>
     </div>
-
+ 
     <!-- Orders -->
     <div id="section-orders" class="admin-section">
       <div class="admin-topbar"><div><h1>Orders</h1><p>Track and manage customer orders</p></div></div>
@@ -149,7 +185,7 @@
         </table></div>
       </div>
     </div>
-
+ 
     <!-- Reservations -->
     <div id="section-reservations" class="admin-section">
       <div class="admin-topbar"><div><h1>Reservations</h1><p>Manage table bookings</p></div></div>
@@ -160,7 +196,7 @@
         </table></div>
       </div>
     </div>
-
+ 
     <!-- Reviews -->
     <div id="section-reviews" class="admin-section">
       <div class="admin-topbar"><div><h1>Reviews</h1><p>Customer feedback and ratings</p></div></div>
@@ -171,13 +207,123 @@
         </table></div>
       </div>
     </div>
-
-  </main>
-</div>
-
+ 
+    <!-- Settings -->
+    <div id="section-settings" class="admin-section">
+      <div class="admin-topbar"><div><h1>Settings</h1><p>Manage your admin account</p></div></div>
+ 
+      <!-- Change Password -->
+      <div class="admin-card" style="max-width:520px;margin-bottom:2rem">
+        <div class="admin-card-header"><h3>🔒 Change Password</h3></div>
+        <div style="padding:1.5rem">
+          <p style="font-size:0.85rem;color:var(--grey);margin-bottom:1.5rem">
+            Update your admin password. You will be logged out after changing it.
+          </p>
+          <form id="changePasswordForm" novalidate>
+            <div class="form-group">
+              <label for="currentPass">Current Password</label>
+              <input type="password" id="currentPass" placeholder="Your current password" required>
+            </div>
+            <div class="form-group">
+              <label for="newPass">New Password</label>
+              <input type="password" id="newPass" placeholder="Min. 6 characters" required>
+            </div>
+            <div class="form-group">
+              <label for="confirmPass">Confirm New Password</label>
+              <input type="password" id="confirmPass" placeholder="Repeat new password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Password</button>
+          </form>
+        </div>
+      </div>
+ 
+      <!-- Recovery Key Info -->
+      <div class="admin-card" style="max-width:520px">
+        <div class="admin-card-header"><h3>🔑 Recovery Key</h3></div>
+        <div style="padding:1.5rem">
+          <p style="font-size:0.85rem;color:var(--grey);margin-bottom:1rem">
+            If you ever forget your password, use this recovery key to reset it from the login page. 
+            <strong style="color:var(--burgundy)">Keep it somewhere safe!</strong>
+          </p>
+          <div style="background:var(--cream);border:1px solid var(--gold);border-radius:2px;padding:1rem;font-family:monospace;font-size:1rem;letter-spacing:0.1em;color:var(--burgundy-deep);text-align:center">
+            ELARA-RECOVERY-2026
+          </div>
+          <p style="font-size:0.78rem;color:var(--grey);margin-top:0.75rem">
+            To change this key, set a <code>RECOVERY_KEY</code> environment variable on Render.
+          </p>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Change Password -->
+    <div id="section-password" class="admin-section">
+      <div class="admin-topbar"><div><h1>Change Password</h1><p>Update your admin login password</p></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
+ 
+        <!-- Change Password Card -->
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>🔒 Change Password</h3></div>
+          <div style="padding:1.5rem">
+            <p style="font-size:0.85rem;color:var(--grey);margin-bottom:1.5rem">You must know your current password to set a new one.</p>
+            <form id="changePasswordForm" novalidate>
+              <div class="form-group">
+                <label for="currentPass">Current Password</label>
+                <input type="password" id="currentPass" placeholder="••••••••" required>
+              </div>
+              <div class="form-group">
+                <label for="newPass">New Password</label>
+                <input type="password" id="newPass" placeholder="Min. 6 characters" required>
+              </div>
+              <div class="form-group">
+                <label for="confirmPass">Confirm New Password</label>
+                <input type="password" id="confirmPass" placeholder="Repeat new password" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                Update Password
+              </button>
+            </form>
+          </div>
+        </div>
+ 
+        <!-- Recovery Key Card -->
+        <div class="admin-card">
+          <div class="admin-card-header"><h3>🛟 Recovery Key</h3></div>
+          <div style="padding:1.5rem">
+            <p style="font-size:0.85rem;color:var(--grey);margin-bottom:1rem">Use this if you forgot your password. Your recovery key is set via the <code style="background:var(--cream);padding:0.2rem 0.4rem;border-radius:2px">RECOVERY_KEY</code> environment variable.</p>
+            <div style="background:var(--cream);border:1px solid var(--gold);border-radius:2px;padding:1rem;margin-bottom:1.5rem">
+              <p style="font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--grey);margin-bottom:0.5rem">Default Recovery Key</p>
+              <code style="font-size:1rem;color:var(--burgundy);font-weight:600">ELARA-RECOVERY-2026</code>
+              <p style="font-size:0.78rem;color:var(--grey);margin-top:0.5rem">Change this in your Render environment variables for security.</p>
+            </div>
+            <form id="recoveryForm" novalidate>
+              <div class="form-group">
+                <label for="recoveryKey">Recovery Key</label>
+                <input type="text" id="recoveryKey" placeholder="ELARA-RECOVERY-2026" required>
+              </div>
+              <div class="form-group">
+                <label for="recoveryNewPass">New Password</label>
+                <input type="password" id="recoveryNewPass" placeholder="Min. 6 characters" required>
+              </div>
+              <div class="form-group">
+                <label for="recoveryConfirmPass">Confirm New Password</label>
+                <input type="password" id="recoveryConfirmPass" placeholder="Repeat new password" required>
+              </div>
+              <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center">
+                Reset Password
+              </button>
+            </form>
+          </div>
+        </div>
+ 
+      </div>
+    </div>
+ 
+ 
+ 
 <!-- Toast -->
 <div class="toast-container" id="toastContainer"></div>
-
+ 
 <script src="admin.js"></script>
 </body>
 </html>
+ 
