@@ -2,14 +2,14 @@
  * Maison Élara — Customer Frontend Script
  * Handles: menu display, cart, checkout, reservations, reviews
  */
-
+ 
 const API = ''; // Empty = same origin (relative URLs)
-
+ 
 // ── State ─────────────────────────────────────────────────────────────────────
 let cart = [];
 let allMenuItems = [];
 let activeCategory = 'all';
-
+ 
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initNav();
@@ -20,24 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   setMinDate();
 });
-
+ 
 // ── Navigation ─────────────────────────────────────────────────────────────── 
 function initNav() {
   const navbar = document.getElementById('navbar');
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
-
+ 
   // Scroll effect
   window.addEventListener('scroll', () => {
     navbar.classList.toggle('scrolled', window.scrollY > 60);
   });
-
+ 
   // Hamburger
   hamburger.addEventListener('click', () => {
     hamburger.classList.toggle('open');
     navLinks.classList.toggle('open');
   });
-
+ 
   // Close nav on link click (mobile)
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
@@ -46,7 +46,7 @@ function initNav() {
     });
   });
 }
-
+ 
 // ── Menu ──────────────────────────────────────────────────────────────────────
 async function loadMenu() {
   try {
@@ -58,7 +58,7 @@ async function loadMenu() {
     document.getElementById('menuGrid').innerHTML = `<p style="color:var(--grey);text-align:center;grid-column:1/-1">Unable to load menu. Please ensure the server is running.</p>`;
   }
 }
-
+ 
 function renderMenu(items) {
   const grid = document.getElementById('menuGrid');
   if (!items.length) {
@@ -76,12 +76,12 @@ function renderMenu(items) {
         <p class="card-desc">${item.description}</p>
         <div class="card-footer">
           <span class="card-price"><sup>€</sup>${item.price.toFixed(2)}</span>
-          <button class="add-to-cart" onclick="addToCart(${item.id})" title="Add to cart">+</button>
+          <button class="add-to-cart" onclick="addToCart('${item.id}')" title="Add to cart">+</button>
         </div>
       </div>
     </div>
   `).join('');
-
+ 
   // Trigger animations
   setTimeout(() => {
     grid.querySelectorAll('.fade-in').forEach((el, i) => {
@@ -89,7 +89,7 @@ function renderMenu(items) {
     });
   }, 50);
 }
-
+ 
 function initCategoryTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -103,31 +103,31 @@ function initCategoryTabs() {
     });
   });
 }
-
+ 
 // ── Cart ──────────────────────────────────────────────────────────────────────
 function initCart() {
   const overlay = document.getElementById('cartOverlay');
   const sidebar = document.getElementById('cartSidebar');
   const toggle = document.getElementById('cartToggle');
   const close = document.getElementById('cartClose');
-
+ 
   const openCart = () => { overlay.classList.add('open'); sidebar.classList.add('open'); };
   const closeCart = () => { overlay.classList.remove('open'); sidebar.classList.remove('open'); };
-
+ 
   toggle.addEventListener('click', e => { e.preventDefault(); openCart(); });
   close.addEventListener('click', closeCart);
   overlay.addEventListener('click', closeCart);
-
+ 
   document.getElementById('checkoutBtn').addEventListener('click', () => {
     closeCart();
     openCheckout();
   });
 }
-
+ 
 function addToCart(menuId) {
   const item = allMenuItems.find(i => i.id === menuId);
   if (!item) return;
-
+ 
   const existing = cart.find(c => c.id === menuId);
   if (existing) {
     existing.quantity++;
@@ -137,12 +137,12 @@ function addToCart(menuId) {
   updateCartUI();
   showToast(`${item.name} added to cart`, 'success');
 }
-
+ 
 function removeFromCart(menuId) {
   cart = cart.filter(c => c.id !== menuId);
   updateCartUI();
 }
-
+ 
 function updateQty(menuId, delta) {
   const item = cart.find(c => c.id === menuId);
   if (!item) return;
@@ -150,26 +150,26 @@ function updateQty(menuId, delta) {
   if (item.quantity <= 0) removeFromCart(menuId);
   else updateCartUI();
 }
-
+ 
 function updateCartUI() {
   const itemsEl = document.getElementById('cartItems');
   const footer = document.getElementById('cartFooter');
   const badge = document.getElementById('cartBadge');
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const totalQty = cart.reduce((sum, i) => sum + i.quantity, 0);
-
+ 
   badge.textContent = totalQty;
   badge.classList.toggle('visible', totalQty > 0);
-
+ 
   if (!cart.length) {
     itemsEl.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
     footer.style.display = 'none';
     return;
   }
-
+ 
   footer.style.display = 'block';
   document.getElementById('cartTotal').textContent = `€${total.toFixed(2)}`;
-
+ 
   itemsEl.innerHTML = cart.map(item => `
     <div class="cart-item">
       <img class="cart-item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none'">
@@ -177,22 +177,22 @@ function updateCartUI() {
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-price">€${item.price.toFixed(2)} each</div>
         <div class="cart-item-qty">
-          <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
+          <button class="qty-btn" onclick="updateQty('${item.id}', -1)">−</button>
           <span class="qty-num">${item.quantity}</span>
-          <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+          <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
         </div>
       </div>
-      <button class="cart-item-remove" onclick="removeFromCart(${item.id})" title="Remove">✕</button>
+      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')" title="Remove">✕</button>
     </div>
   `).join('');
 }
-
+ 
 // ── Checkout ──────────────────────────────────────────────────────────────────
 function openCheckout() {
   const modal = document.getElementById('checkoutModal');
   const summary = document.getElementById('orderSummary');
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
+ 
   summary.innerHTML = `
     <div style="font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--grey);margin-bottom:0.75rem">Order Summary</div>
     ${cart.map(i => `
@@ -208,7 +208,7 @@ function openCheckout() {
   `;
   modal.classList.add('open');
 }
-
+ 
 function initForms() {
   // Checkout modal close
   document.getElementById('checkoutClose').addEventListener('click', () => {
@@ -218,14 +218,14 @@ function initForms() {
     if (e.target === document.getElementById('checkoutModal'))
       document.getElementById('checkoutModal').classList.remove('open');
   });
-
+ 
   // Checkout form submit
   document.getElementById('checkoutForm').addEventListener('submit', async e => {
     e.preventDefault();
     const name = document.getElementById('custName').value.trim();
     const email = document.getElementById('custEmail').value.trim();
     if (!name || !email) { showToast('Please fill in your name and email', 'error'); return; }
-
+ 
     const orderData = {
       customerName: name,
       customerEmail: email,
@@ -238,7 +238,7 @@ function initForms() {
       })),
       total: cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
     };
-
+ 
     try {
       const res = await fetch(`${API}/api/orders`, {
         method: 'POST',
@@ -255,7 +255,7 @@ function initForms() {
       showToast('Could not place order. Please try again.', 'error');
     }
   });
-
+ 
   // Reservation form
   document.getElementById('reservationForm').addEventListener('submit', async e => {
     e.preventDefault();
@@ -272,7 +272,7 @@ function initForms() {
     if (!data.name || !data.email || !data.date || !data.time || !data.guests) {
       showToast('Please fill in all required fields', 'error'); return;
     }
-
+ 
     try {
       const res = await fetch(`${API}/api/reservations`, {
         method: 'POST',
@@ -286,7 +286,7 @@ function initForms() {
       showToast('Could not submit reservation. Please try again.', 'error');
     }
   });
-
+ 
   // Review form
   document.getElementById('reviewForm').addEventListener('submit', async e => {
     e.preventDefault();
@@ -294,11 +294,11 @@ function initForms() {
     const rating = form.rating.value;
     const name = form.name.value.trim();
     const comment = form.comment.value.trim();
-
+ 
     if (!name || !rating || !comment) {
       showToast('Please fill in all fields and select a rating', 'error'); return;
     }
-
+ 
     try {
       const res = await fetch(`${API}/api/reviews`, {
         method: 'POST',
@@ -314,7 +314,7 @@ function initForms() {
     }
   });
 }
-
+ 
 // ── Reviews ───────────────────────────────────────────────────────────────────
 async function loadReviews() {
   try {
@@ -336,7 +336,7 @@ async function loadReviews() {
     document.getElementById('reviewsGrid').innerHTML = '<p style="color:var(--grey)">Reviews unavailable.</p>';
   }
 }
-
+ 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function showToast(message, type = '') {
   const container = document.getElementById('toastContainer');
@@ -350,21 +350,21 @@ function showToast(message, type = '') {
     setTimeout(() => toast.remove(), 400);
   }, 3500);
 }
-
+ 
 function setMinDate() {
   const dateInput = document.getElementById('resDate');
   if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
 }
-
+ 
 function initScrollAnimations() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) entry.target.classList.add('visible');
     });
   }, { threshold: 0.15 });
-
+ 
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
+ 
   // Re-observe dynamically added elements
   new MutationObserver(() => {
     document.querySelectorAll('.fade-in:not(.observed)').forEach(el => {
@@ -373,3 +373,4 @@ function initScrollAnimations() {
     });
   }).observe(document.body, { childList: true, subtree: true });
 }
+ 
