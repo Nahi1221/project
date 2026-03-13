@@ -8,19 +8,19 @@
  * http://localhost:3000        → Customer site
  * http://localhost:3000/admin  → Admin panel
  */
-
+ 
 require('dotenv').config();
 const express  = require('express');
 const mongoose = require('mongoose');
 const path     = require('path');
-
+ 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-
+ 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.static(__dirname));
-
+ 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
@@ -28,10 +28,10 @@ app.use((req, res, next) => {
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
-
+ 
 // ── MongoDB Connection ────────────────────────────────────────────────────────
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/maison-elara';
-
+ 
 mongoose.connect(MONGODB_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB');
@@ -42,7 +42,7 @@ mongoose.connect(MONGODB_URI)
     console.error('   Make sure MONGODB_URI is set correctly in your .env file');
     process.exit(1);
   });
-
+ 
 // ── Mongoose Schemas & Models ─────────────────────────────────────────────────
 const menuSchema = new mongoose.Schema({
   name:        { type: String, required: true },
@@ -52,7 +52,7 @@ const menuSchema = new mongoose.Schema({
   image:       { type: String, default: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80' },
   available:   { type: Boolean, default: true }
 }, { timestamps: true });
-
+ 
 const orderSchema = new mongoose.Schema({
   customerName:  { type: String, required: true },
   customerEmail: { type: String, required: true },
@@ -66,7 +66,7 @@ const orderSchema = new mongoose.Schema({
   notes:  { type: String, default: '' },
   status: { type: String, default: 'pending', enum: ['pending','preparing','completed','cancelled'] }
 }, { timestamps: true });
-
+ 
 const reservationSchema = new mongoose.Schema({
   name:   { type: String, required: true },
   email:  { type: String, required: true },
@@ -77,23 +77,26 @@ const reservationSchema = new mongoose.Schema({
   notes:  { type: String, default: '' },
   status: { type: String, default: 'pending', enum: ['pending','confirmed','cancelled'] }
 }, { timestamps: true });
-
+ 
 const reviewSchema = new mongoose.Schema({
   name:    { type: String, required: true },
   rating:  { type: Number, required: true, min: 1, max: 5 },
   comment: { type: String, required: true }
 }, { timestamps: true });
-
+ 
 const MenuItem    = mongoose.model('MenuItem',    menuSchema);
 const Order       = mongoose.model('Order',       orderSchema);
 const Reservation = mongoose.model('Reservation', reservationSchema);
 const Review      = mongoose.model('Review',      reviewSchema);
-
+ 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 const activeSessions = new Set();
-const ADMIN_USER     = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASS     = process.env.ADMIN_PASSWORD || 'maison2026';
-
+let ADMIN_USER     = process.env.ADMIN_USERNAME || 'admin';
+let ADMIN_PASS     = process.env.ADMIN_PASSWORD || 'maison2026';
+ 
+// Recovery key — store this somewhere safe! Used to reset password without login.
+const RECOVERY_KEY = process.env.RECOVERY_KEY || 'ELARA-RECOVERY-2026';
+ 
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization;
   if (!token || !activeSessions.has(token)) {
@@ -101,7 +104,7 @@ function authMiddleware(req, res, next) {
   }
   next();
 }
-
+ 
 // ── AUTH Routes ───────────────────────────────────────────────────────────────
 app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
@@ -113,12 +116,47 @@ app.post('/api/admin/login', (req, res) => {
     res.status(401).json({ error: 'Invalid credentials' });
   }
 });
-
+ 
 app.post('/api/admin/logout', authMiddleware, (req, res) => {
   activeSessions.delete(req.headers.authorization);
   res.json({ success: true });
 });
-
+ 
+// Change password (must be logged in)
+app.post('/api/admin/change-password', authMiddleware, (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Both current and new password are required' });
+  }
+  if (currentPassword !== ADMIN_PASS) {
+    return res.status(401).json({ error: 'Current password is incorrect' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  }
+  ADMIN_PASS = newPassword;
+  // Clear all sessions so everyone must re-login with new password
+  activeSessions.clear();
+  res.json({ success: true, message: 'Password changed successfully. Please log in again.' });
+});
+ 
+// Recovery — reset password using recovery key (no login needed)
+app.post('/api/admin/recover', (req, res) => {
+  const { recoveryKey, newPassword } = req.body;
+  if (!recoveryKey || !newPassword) {
+    return res.status(400).json({ error: 'Recovery key and new password are required' });
+  }
+  if (recoveryKey !== RECOVERY_KEY) {
+    return res.status(401).json({ error: 'Invalid recovery key' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  }
+  ADMIN_PASS = newPassword;
+  activeSessions.clear();
+  res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
+});
+ 
 // ── MENU Routes ───────────────────────────────────────────────────────────────
 app.get('/api/menu', async (req, res) => {
   try {
@@ -129,7 +167,7 @@ app.get('/api/menu', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 app.post('/api/menu', authMiddleware, async (req, res) => {
   try {
     const item = await MenuItem.create(req.body);
@@ -138,7 +176,7 @@ app.post('/api/menu', authMiddleware, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 app.put('/api/menu/:id', authMiddleware, async (req, res) => {
   try {
     const item = await MenuItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -148,7 +186,7 @@ app.put('/api/menu/:id', authMiddleware, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 app.delete('/api/menu/:id', authMiddleware, async (req, res) => {
   try {
     const item = await MenuItem.findByIdAndDelete(req.params.id);
@@ -158,7 +196,7 @@ app.delete('/api/menu/:id', authMiddleware, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 // ── ORDER Routes ──────────────────────────────────────────────────────────────
 app.get('/api/orders', authMiddleware, async (req, res) => {
   try {
@@ -168,7 +206,7 @@ app.get('/api/orders', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 app.post('/api/orders', async (req, res) => {
   try {
     const order = await Order.create(req.body);
@@ -177,7 +215,7 @@ app.post('/api/orders', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 app.put('/api/orders/:id', authMiddleware, async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -187,7 +225,7 @@ app.put('/api/orders/:id', authMiddleware, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 // ── RESERVATION Routes ────────────────────────────────────────────────────────
 app.get('/api/reservations', authMiddleware, async (req, res) => {
   try {
@@ -197,7 +235,7 @@ app.get('/api/reservations', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 app.post('/api/reservations', async (req, res) => {
   try {
     const reservation = await Reservation.create(req.body);
@@ -206,7 +244,7 @@ app.post('/api/reservations', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 app.put('/api/reservations/:id', authMiddleware, async (req, res) => {
   try {
     const reservation = await Reservation.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -216,7 +254,7 @@ app.put('/api/reservations/:id', authMiddleware, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 // ── REVIEW Routes ─────────────────────────────────────────────────────────────
 app.get('/api/reviews', async (req, res) => {
   try {
@@ -226,7 +264,7 @@ app.get('/api/reviews', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 app.post('/api/reviews', async (req, res) => {
   try {
     const review = await Review.create(req.body);
@@ -235,7 +273,7 @@ app.post('/api/reviews', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-
+ 
 // ── STATS Route ───────────────────────────────────────────────────────────────
 app.get('/api/stats', authMiddleware, async (req, res) => {
   try {
@@ -254,11 +292,11 @@ app.get('/api/stats', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 // ── HTML Pages ────────────────────────────────────────────────────────────────
 app.get('/',      (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
-
+ 
 // ── Helper: convert MongoDB _id → id for frontend ────────────────────────────
 function formatDoc(doc) {
   const obj = doc.toObject ? doc.toObject() : doc;
@@ -266,7 +304,7 @@ function formatDoc(doc) {
   if (obj.createdAt instanceof Date) obj.createdAt = obj.createdAt.toISOString();
   return obj;
 }
-
+ 
 // ── Seed initial menu if empty ────────────────────────────────────────────────
 async function seedDatabase() {
   const count = await MenuItem.countDocuments();
@@ -288,7 +326,7 @@ async function seedDatabase() {
   ]);
   console.log('✅ Menu seeded with 12 items');
 }
-
+ 
 // ── Start ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🍽️  Maison Élara running at http://localhost:${PORT}`);
